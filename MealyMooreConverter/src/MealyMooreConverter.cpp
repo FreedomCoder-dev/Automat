@@ -1,7 +1,7 @@
 #include "MealyMooreConverter.h"
 
 const string MOORE_TO_MEALY_PARAM = "moore-to-mealy";
-//функция печати полностью исправна
+//ГґГіГ­ГЄГ¶ГЁГї ГЇГҐГ·Г ГІГЁ ГЇГ®Г«Г­Г®Г±ГІГјГѕ ГЁГ±ГЇГ°Г ГўГ­Г 
 void PrintFile(vector<vector<string>>& TableResult, const string& filename)
 {
     ofstream file(filename);
@@ -13,10 +13,10 @@ void PrintFile(vector<vector<string>>& TableResult, const string& filename)
         file << endl;
     }
 }
-//функция полностью исправна из Мили->Мура
+//С„СѓРЅРєС†РёСЏ РїРѕР»РЅРѕСЃС‚СЊСЋ РёСЃРїСЂР°РІРЅР° РёР· РњРёР»Рё->РњСѓСЂР°
 vector<vector<string>> ProcessMealy(vector<vector<string>>& TableMealy)
 {
-    vector<vector<string>> result;
+	vector<vector<string>> result;
 
     map<string, string> stateToOutput;
     unordered_set<string> uniqueOutputs;
@@ -37,7 +37,7 @@ vector<vector<string>> ProcessMealy(vector<vector<string>>& TableMealy)
         }
     }
 
-    //Создать новые состояния для автомата Мура
+    //РЎРѕР·РґР°С‚СЊ РЅРѕРІС‹Рµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РґР»СЏ Р°РІС‚РѕРјР°С‚Р° РњСѓСЂР°
     map<string, string> newStateMap;
     int newStateIndex = 0;
     for (const auto& combined : orderedOutputs)
@@ -46,45 +46,47 @@ vector<vector<string>> ProcessMealy(vector<vector<string>>& TableMealy)
         newStateMap[combined] = newState;
     }
 
-    //Заполнить верхнюю часть таблицы Мура
-    vector<string> headerRow = { "" };
+    //Р—Р°РїРѕР»РЅРёС‚СЊ РІРµСЂС…РЅСЋСЋ С‡Р°СЃС‚СЊ С‚Р°Р±Р»РёС†С‹ РњСѓСЂР°
+    vector<string> headerRow = { "" }, headerOut = { "" };
     for (const auto& combined : orderedOutputs) {
         string newState = newStateMap[combined];
         string output = combined.substr(combined.find('/') + 1);
-        headerRow.push_back(newState + "/" + output);
+        headerRow.push_back(newState);
+        headerOut.push_back(output);
     }
+    result.push_back(headerOut);
     result.push_back(headerRow);
 
-    //Заполнить таблицу Мура на основе таблицы Мили
+    //Р—Р°РїРѕР»РЅРёС‚СЊ С‚Р°Р±Р»РёС†Сѓ РњСѓСЂР° РЅР° РѕСЃРЅРѕРІРµ С‚Р°Р±Р»РёС†С‹ РњРёР»Рё
     unsigned int el = 0;
     for (size_t i = 1; i < TableMealy.size(); ++i) {
         vector<string> newRow = { TableMealy[i][0] };
-        newRow.resize(result[0].size());
+        newRow.resize(result[1].size());
         for (size_t j = 1; j < TableMealy[i].size(); ++j) {
             string cell = TableMealy[i][j],
                 newState = newStateMap[cell];
             size_t slashPos = cell.find('/');
-            string output = TableMealy[0][j];//состояние из начальной таблицы
+            string output = TableMealy[0][j];//СЃРѕСЃС‚РѕСЏРЅРёРµ РёР· РЅР°С‡Р°Р»СЊРЅРѕР№ С‚Р°Р±Р»РёС†С‹
 
             for (const string& element : orderedOutputs) {
                 cell = element;
                 slashPos = cell.find('/');
-                cell = cell.substr(0, slashPos);//состояние из полученной таблицы
+                cell = cell.substr(0, slashPos);//СЃРѕСЃС‚РѕСЏРЅРёРµ РёР· РїРѕР»СѓС‡РµРЅРЅРѕР№ С‚Р°Р±Р»РёС†С‹
                 el++;
                 if (output == cell)
                 {
                     newRow[el] = newState;
                 }
             }
-            el = 0;
+            el=0;
         }
         result.push_back(newRow);
         el = 0;
     }
 
-    return result;
+	return result;
 }
-//функция полностью исправна из Мили->Мура
+//С„СѓРЅРєС†РёСЏ РїРѕР»РЅРѕСЃС‚СЊСЋ РёСЃРїСЂР°РІРЅР° РёР· РњРёР»Рё->РњСѓСЂР°
 void RemoveStatesMealy(vector<vector<string>>& TableMealy) {
     queue<string> stateQueue;
     set<string> reachableStates;
@@ -92,23 +94,23 @@ void RemoveStatesMealy(vector<vector<string>>& TableMealy) {
 
     for (size_t i = 1; i < TableMealy[0].size(); ++i)
     {
-        for (size_t j = 1; j < TableMealy.size(); ++j)
+        for (size_t j = 2; j < TableMealy.size(); ++j)
         {
             reachableStates.insert(TableMealy[j][i]);
         }
     }
-    for (size_t i = 0; i < 1; ++i)
+    for (size_t i = 1; i < 2; ++i)//Р±С‹Р»Рѕ 0
     {
-        for (size_t j = 1; j < TableMealy[i].size(); ++j)
+        for (size_t j = 1; j < TableMealy[i].size(); ++j)//Р±С‹Р»Рѕ 1
         {
             currentState = TableMealy[i][j];
-            size_t slash = currentState.find('/');
-            currentState = currentState.substr(0, slash);
+            //size_t slash = currentState.find('/');
+            //currentState = currentState.substr(0, slash);
             if (reachableStates.find(currentState) == reachableStates.end())
             {
                 for (size_t l = 0; l < TableMealy.size(); ++l)
                 {
-                    if (l != 0)
+                    if ((l != 1) && (l != 0))
                     {
                         stateQueue.push(TableMealy[l][j]);
                     }
@@ -119,14 +121,14 @@ void RemoveStatesMealy(vector<vector<string>>& TableMealy) {
         }
     }
     string norm;
-    for (size_t i = 0; i < 1; ++i)
+    for (size_t i = 1; i < 2; ++i)//Р±С‹Р»Рѕ 0 < 1
     {
-
+        
         for (size_t j = 1; j < TableMealy[i].size(); ++j)
         {
-            if (stateQueue.empty()) break;
+            if(stateQueue.empty()) break;
             currentState = stateQueue.front();
-            for (size_t l = 1; l < TableMealy.size(); ++l)
+            for (size_t l = 2; l < TableMealy.size(); ++l)//Р±С‹Р»Рѕ 1
             {
                 if (currentState == TableMealy[l][j])
                 {
@@ -139,8 +141,8 @@ void RemoveStatesMealy(vector<vector<string>>& TableMealy) {
                 for (size_t k = 1; k < TableMealy[i].size(); ++k)
                 {
                     norm = TableMealy[i][k];
-                    size_t slash = norm.find('/');
-                    norm = norm.substr(0, slash);
+                    //size_t slash = norm.find('/');
+                    //norm = norm.substr(0, slash);
                     if (norm == currentState)
                     {
                         for (size_t m = 0; m < TableMealy.size(); ++m)
@@ -164,7 +166,7 @@ vector<vector<string>> ProcessMoore(vector<vector<string>>& TableMoore, string n
     string first, second;
     unsigned int count = 0, i = 2;
     map<string, string> stat;
-
+    
 
 
     for (size_t j = 1; j < TableMoore[i].size(); ++j)
@@ -173,8 +175,8 @@ vector<vector<string>> ProcessMoore(vector<vector<string>>& TableMoore, string n
         {
             first += TableMoore[l][j];
         }
-
-        if (TableMoore[i].size() == j + 1)
+        
+        if (TableMoore[i].size() == j+1)
         {
             second = "";
         }
@@ -184,7 +186,7 @@ vector<vector<string>> ProcessMoore(vector<vector<string>>& TableMoore, string n
                 second += TableMoore[l][j + 1];
             }
         }
-
+           
         if (first == second)
         {
             stat[states[j]] = newStatePrefix + to_string(count);
@@ -249,10 +251,10 @@ void RemoveStatesMoore(vector<vector<string>>& TableMoore) {
     for (size_t j = 1; j < TableMoore.size(); ++j)
     {
         string nextState = TableMoore[j][1];
-        nextState = nextState.substr(0, 2);
+        nextState = nextState.substr(0, 2);        
         reachableStates.insert(nextState);
     }
-
+    
     unsigned int count = 2, i = 1, j = 2;
     while (j != TableMoore[i].size())
     {
@@ -274,9 +276,9 @@ void RemoveStatesMoore(vector<vector<string>>& TableMoore) {
             j++;
             count++;
         }
-        else
+        else 
         {
-            //удаляю колонку
+            //СѓРґР°Р»СЏСЋ РєРѕР»РѕРЅРєСѓ
             for (size_t l = 0; l < TableMoore.size(); l++)
             {
                 TableMoore[l].erase(TableMoore[l].begin() + j);
@@ -291,22 +293,22 @@ int main(int argc, char* argv[])
     string inputFile = argv[2];
     string outputFile = argv[3];
 
-    ifstream file(inputFile);
-    vector<vector<string>> table;
-    string line;
+	ifstream file(inputFile);
+	vector<vector<string>> table;
+	string line;
 
-    if (workParam == MOORE_TO_MEALY_PARAM)//Это из Мура в Мили
+    if (workParam == MOORE_TO_MEALY_PARAM)//Р­С‚Рѕ РёР· РњСѓСЂР° РІ РњРёР»Рё
     {
-        if (getline(file, line)) {
-            vector<string> row;
-            stringstream ss(line);
-            string cell;
+	    if (getline(file, line)) {
+		    vector<string> row;
+		    stringstream ss(line);
+		    string cell;
 
-            while (getline(ss, cell, ';')) {
-                row.push_back(cell);
-            }
-            table.push_back(row);
-        }
+		    while (getline(ss, cell, ';')) {
+			    row.push_back(cell);
+		    }
+		    table.push_back(row);
+	    }
 
         if (getline(file, line)) {
             vector<string> row;
@@ -330,29 +332,29 @@ int main(int argc, char* argv[])
             table.push_back(row);
         }
         file.close();
-        vector<vector<string>> resultTable = ProcessMoore(table);
+	    vector<vector<string>> resultTable = ProcessMoore(table);
         RemoveStatesMoore(resultTable);
         PrintFile(resultTable, outputFile);
     }
-    else//Это из Мили в Мура
+    else//Р­С‚Рѕ РёР· РњРёР»Рё РІ РњСѓСЂР°
     {
-        while (getline(file, line))
-        {
-            vector<string> row;
-            stringstream ss(line);
-            string cell;
+	    while (getline(file, line))
+	    {
+		    vector<string> row;
+		    stringstream ss(line);
+		    string cell;
 
-            while (getline(ss, cell, ';'))
-            {
-                row.push_back(cell);
-            }
-            table.push_back(row);
-        }
+		    while (getline(ss, cell, ';'))
+		    {
+			    row.push_back(cell);
+		    }
+		    table.push_back(row);
+	    }
         file.close();
         vector<vector<string>> resultTable = ProcessMealy(table);
         RemoveStatesMealy(resultTable);
         PrintFile(resultTable, outputFile);
     }
 
-    return 0;
+	return 0;
 }
