@@ -52,11 +52,21 @@ vector<vector<string>> ProcessMealy(vector<vector<string>>& TableMealy)
 
     //Заполнить верхнюю часть таблицы Мура
     vector<string> headerRow = { "" }, headerOut = { "" };
+    string first;
     for (const auto& combined : orderedOutputs) {
         string newState = newStateMap[combined];
         string output = combined.substr(combined.find('/') + 1);
-        headerRow.push_back(newState);
-        headerOut.push_back(output);
+        size_t slash = combined.find('/');
+        first = combined.substr(0, slash);
+        if (first == TableMealy[0][1])
+        {
+            headerRow.insert(headerRow.begin() + 1, newState);
+            headerOut.insert(headerOut.begin() + 1, output);
+        }
+        else {
+            headerRow.push_back(newState);
+            headerOut.push_back(output);
+        }
     }
     result.push_back(headerOut);
     result.push_back(headerRow);
