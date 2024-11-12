@@ -7,10 +7,14 @@ void PrintFile(vector<vector<string>>& TableResult, const string& filename)
     ofstream file(filename);
 
     for (const auto& row : TableResult) {
-        for (const auto& cell : row) {
-            file << cell << ";";
+        for (size_t i = 0; i < row.size(); ++i) {
+            const auto& cell = row[i];
+            file << cell;
+            if (i < row.size() - 1) {
+                file << ";";
+            }
         }
-        file << endl;
+        file << std::endl;
     }
 }
 //функция полностью исправна из Мили->Мура
@@ -298,6 +302,27 @@ void RemoveStatesMoore(vector<vector<string>>& TableMoore)
         }
     }
 }
+//функция полностью исправна из Мура->Мили
+void DeleteStatesMoore(vector<vector<string>>& TableMoore)
+{
+    set<string> state;
+    string first, second;
+    for (size_t i = 1; i < TableMoore[0].size(); ++i)
+    {
+        first = TableMoore[0][i];
+        if (state.find(first) == state.end())
+        {
+            state.insert(first);
+        }
+        else {
+            for (size_t m = 0; m < TableMoore.size(); ++m)
+            {
+                TableMoore[m].erase(TableMoore[m].begin() + i);
+            }
+            i--;
+        }
+    }
+}
 
 int main(int argc, char* argv[])
 {
@@ -346,6 +371,7 @@ int main(int argc, char* argv[])
         file.close();
 	    vector<vector<string>> resultTable = ProcessMoore(table);
         RemoveStatesMoore(resultTable);
+	DeleteStatesMoore(resultTable);
         PrintFile(resultTable, outputFile);
     }
     else//Это из Мили в Мура
