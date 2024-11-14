@@ -149,6 +149,7 @@ void RemoveStatesMealy(vector<vector<string>>& TableMealy) {
                 {
                     TableMealy[m].erase(TableMealy[m].begin() + k);
                 }
+		k--;
             }
         }
     }
@@ -227,72 +228,61 @@ vector<vector<string>> ProcessMoore(vector<vector<string>>& TableMoore, string n
 }
 //функция полностью исправна из Мура->Мили
 void RemoveStatesMoore(vector<vector<string>>& TableMoore) 
-{
-    set<string> state;
-    string first, second;
-    for (size_t i = 1; i < TableMoore.size(); ++i)
-    {
-        for (size_t j = 1; j < TableMoore[i].size(); ++j)
-        {
-            first = TableMoore[i][j];
-            size_t slash = first.find('/');
-            first = first.substr(0, slash);
-            state.insert(first);
-        }
-    }
-    unsigned int el = 1;
+{  
     queue<string> stateQueue;
-    for (size_t i = 1; i < TableMoore[0].size(); ++i)
+    set<string> reachableStates;
+    string currentState;
+    unsigned int i = 1;
+    reachableStates.insert(TableMoore[0][1]);
+    for (int l = 1; l < TableMoore.size(); l++)
     {
-        first = TableMoore[0][i];
-        if (state.find(first) == state.end())
-        {
-            for (size_t l = 0; l < TableMoore.size(); ++l)
-            {
-                if (l != 0)
-                {
-                    second = TableMoore[l][i];
-                    size_t slash = second.find('/');
-                    second = second.substr(0, slash);
-                    stateQueue.push(second);
-                }
-                TableMoore[l].erase(TableMoore[l].begin() + i);
-            }
-            i--;
-        }
+        currentState = TableMoore[l][1];
+        size_t slash = currentState.find('/');
+        currentState = currentState.substr(0, slash);
+        stateQueue.push(currentState);
     }
     while (!stateQueue.empty())
     {
-        first = stateQueue.front();
-        for (size_t i = 1; i < TableMoore[0].size(); ++i)
+        currentState = stateQueue.front();
+        stateQueue.pop();
+        i = 1;
+        for (i; i < TableMoore[0].size(); i++)
         {
-            if (stateQueue.empty()) break;
-            for (size_t l = 1; l < TableMoore.size(); ++l)
+            if (currentState == TableMoore[0][i])
             {
-                second = TableMoore[l][i];
-                size_t slash = second.find('/');
-                second = second.substr(0, slash);
-                if (second == first)
-                {
-                    stateQueue.pop();
-                    break;
-                }
+                break;
             }
-            if (i == TableMoore[0].size() - 1)
+        }
+        for (int l = 1; l < TableMoore[0][i].size(); l++)
+        {
+            if (reachableStates.find(currentState) == reachableStates.end())
             {
-                for (size_t k = 1; k < TableMoore[0].size(); ++k)
+                reachableStates.insert(currentState);
+                for (int k = 1; k < TableMoore.size(); k++)
                 {
-                    second = TableMoore[0][k];
-                    if (second == first)
+                    if (currentState != TableMoore[k][i])
                     {
-                        for (size_t m = 0; m < TableMoore.size(); ++m)
-                        {
-                            TableMoore[m].erase(TableMoore[m].begin() + k);
-                        }
-                        break;
+                        currentState = TableMoore[k][i];
+                        size_t slash = currentState.find('/');
+                        currentState = currentState.substr(0, slash);
+                        stateQueue.push(currentState);
                     }
                 }
-                stateQueue.pop();
+            }
+        }
+    }
+    for (int l = 0; l < 1; l++)
+    {
+        for (int k = 1; k < TableMoore[0].size(); k++)
+        {
+            currentState = TableMoore[l][k];
+            if (reachableStates.find(currentState) == reachableStates.end())
+            {
+                for (int m = 0; m < TableMoore.size(); m++)
+                {
+                    TableMoore[m].erase(TableMoore[m].begin() + k);
+                }
+                k--;
             }
         }
     }
