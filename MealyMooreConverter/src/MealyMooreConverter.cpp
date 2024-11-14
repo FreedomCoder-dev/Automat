@@ -105,65 +105,50 @@ void RemoveStatesMealy(vector<vector<string>>& TableMealy) {
     queue<string> stateQueue;
     set<string> reachableStates;
     string currentState;
-
-    for (size_t i = 1; i < TableMealy[0].size(); ++i)
+    unsigned int i = 1;
+    reachableStates.insert(TableMealy[1][1]);
+    for (int l = 2; l < TableMealy.size(); l++)
     {
-        for (size_t j = 2; j < TableMealy.size(); ++j)
-        {
-            reachableStates.insert(TableMealy[j][i]);
-        }
+        stateQueue.push(TableMealy[l][1]);
     }
-    for (size_t i = 1; i < 2; ++i)//было 0
+    while(!stateQueue.empty())
     {
-        for (size_t j = 1; j < TableMealy[i].size(); ++j)//было 1
+        currentState = stateQueue.front();
+        stateQueue.pop();
+        i = 1;
+        for (i; i < TableMealy[1].size(); i++)
         {
-            currentState = TableMealy[i][j];
+            if (currentState == TableMealy[1][i])
+            {
+                break;
+            }
+        }
+        for (int l = 1; l < TableMealy[1][i].size(); l++)
+        {
             if (reachableStates.find(currentState) == reachableStates.end())
             {
-                for (size_t l = 0; l < TableMealy.size(); ++l)
+                reachableStates.insert(currentState);
+                for (int k = 2; k < TableMealy.size(); k++) 
                 {
-                    if ((l != 1) && (l != 0))
+                    if (currentState != TableMealy[k][i])
                     {
-                        stateQueue.push(TableMealy[l][j]);
+                        stateQueue.push(TableMealy[k][i]);
                     }
-                    TableMealy[l].erase(TableMealy[l].begin() + j);
                 }
-                j--;
             }
         }
     }
-    string norm;
-    for (size_t i = 1; i < 2; ++i)//было 0 < 1
+    for (int l = 1; l < 2; l++)
     {
-        
-        for (size_t j = 1; j < TableMealy[i].size(); ++j)
+        for (int k = 1; k < TableMealy[0].size(); k++)
         {
-            if(stateQueue.empty()) break;
-            currentState = stateQueue.front();
-            for (size_t l = 2; l < TableMealy.size(); ++l)//было 1
+            currentState = TableMealy[l][k];
+            if (reachableStates.find(currentState) == reachableStates.end())
             {
-                if (currentState == TableMealy[l][j])
+                for (int m = 0; m < TableMealy.size(); m++)
                 {
-                    stateQueue.pop();
-                    j = 0;
+                    TableMealy[m].erase(TableMealy[m].begin() + k);
                 }
-            }
-            if (j == (TableMealy[i].size() - 1))
-            {
-                for (size_t k = 1; k < TableMealy[i].size(); ++k)
-                {
-                    norm = TableMealy[i][k];
-                    if (norm == currentState)
-                    {
-                        for (size_t m = 0; m < TableMealy.size(); ++m)
-                        {
-                            TableMealy[m].erase(TableMealy[m].begin() + k);
-                        }
-                        break;
-                    }
-                }
-                stateQueue.pop();
-                j = 0;
             }
         }
     }
