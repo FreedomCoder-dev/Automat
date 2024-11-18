@@ -317,6 +317,7 @@ void DeleteStatesMoore(vector<vector<string>>& TableMoore)
     }
 }
 
+
 int main(int argc, char* argv[])
 {
     string workParam = argv[1];
@@ -364,7 +365,7 @@ int main(int argc, char* argv[])
         file.close();
 	    vector<vector<string>> resultTable = ProcessMoore(table);
         RemoveStatesMoore(resultTable);
-	DeleteStatesMoore(resultTable);
+        DeleteStatesMoore(resultTable);
         PrintFile(resultTable, outputFile);
     }
     else//Это из Мили в Мура
