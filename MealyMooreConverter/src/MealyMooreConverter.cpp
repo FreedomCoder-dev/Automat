@@ -24,7 +24,7 @@ vector<vector<string>> ProcessMealy(vector<vector<string>>& TableMealy)
 
     map<string, string> stateToOutput;
     unordered_set<string> uniqueOutputs;
-    vector<string> orderedOutputs;
+    vector<string> orderedOutputs = { "" };
 
     for (size_t i = 1; i < TableMealy.size(); ++i) {
         for (size_t j = 1; j < TableMealy[i].size(); ++j) {
@@ -36,11 +36,19 @@ vector<vector<string>> ProcessMealy(vector<vector<string>>& TableMealy)
             if (uniqueOutputs.find(cell) == uniqueOutputs.end())
             {
                 uniqueOutputs.insert(cell);
-                orderedOutputs.push_back(cell);
+                if (state == TableMealy[0][1])
+                {
+                    orderedOutputs.insert(orderedOutputs.begin() + 1, cell);
+                }
+                else
+                {
+                    orderedOutputs.push_back(cell);
+                }
+                
             }
         }
     }
-
+    orderedOutputs.erase(orderedOutputs.begin());
     //Создать новые состояния для автомата Мура
     map<string, string> newStateMap;
     int newStateIndex = 0;
@@ -79,7 +87,7 @@ vector<vector<string>> ProcessMealy(vector<vector<string>>& TableMealy)
         for (size_t j = 1; j < TableMealy[i].size(); ++j) {
             string cell = TableMealy[i][j],
                 newState = newStateMap[cell];
-            size_t slashPos = cell.find('/');
+            size_t slashPos;
             string output = TableMealy[0][j];//состояние из начальной таблицы
 
             for (const string& element : orderedOutputs) {
@@ -149,7 +157,7 @@ void RemoveStatesMealy(vector<vector<string>>& TableMealy) {
                 {
                     TableMealy[m].erase(TableMealy[m].begin() + k);
                 }
-		k--;
+                k--;
             }
         }
     }
