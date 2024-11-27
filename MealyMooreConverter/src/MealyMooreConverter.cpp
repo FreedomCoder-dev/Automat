@@ -20,84 +20,112 @@ void PrintFile(vector<vector<string>>& TableResult, const string& filename)
 //функция полностью исправна из Мили->Мура
 vector<vector<string>> ProcessMealy(vector<vector<string>>& TableMealy)
 {
-    vector<vector<string>> result;
-    unordered_map<string, string> stateOutputs;
-    set<string> states;
+	vector<vector<string>> result;
 
-    string initialState = TableMealy[1][1];
-    stateOutputs[initialState] = "";
+    //map<string, string> stateToOutput;
+    unordered_set<string> uniqueOutputs;
+    vector<string> orderedOutputs = { "" };
 
-    for (size_t i = 1; i < TableMealy.size(); ++i)
-    {
-        for (size_t j = 1; j < TableMealy[i].size(); ++j)
-        {
-            string transition = TableMealy[i][j];
-            size_t slashPos = transition.find('/');
-            if (slashPos != string::npos)
+    for (size_t i = 1; i < TableMealy.size(); ++i) {
+        for (size_t j = 1; j < TableMealy[i].size(); ++j) {
+            string cell = TableMealy[i][j];
+            size_t slashPos = cell.find('/');
+            string state = cell.substr(0, slashPos);
+            string output = cell.substr(slashPos + 1);
+            //stateToOutput[state] = output;
+            if (uniqueOutputs.find(cell) == uniqueOutputs.end())
             {
-                string nextState = transition.substr(0, slashPos);
-                string output = transition.substr(slashPos + 1);
-                stateOutputs[nextState] = output;
-                states.insert(nextState);
-            }
-            else
-            {
-                string nextState = transition;
-                stateOutputs[nextState] = "";
-                states.insert(nextState);
+                uniqueOutputs.insert(cell);
+                if (state == TableMealy[0][1])
+                {
+                    orderedOutputs.insert(orderedOutputs.begin() + 1, cell);
+                }
+                else
+                {
+                    orderedOutputs.push_back(cell);
+                }
+                
             }
         }
     }
-    unordered_map<string, string> stateMap;
-    vector<string> orderedStates = { initialState };
+    orderedOutputs.erase(orderedOutputs.begin());
+
+    for (int i = 0; i < orderedOutputs.size(); i++)
+    {
+        string cell = orderedOutputs[i];
+        size_t slash = cell.find('/');
+        string state = cell.substr(0, slash);
+        if (TableMealy[0][1] == state)
+        {
+            break;
+        }
+        if (i == orderedOutputs.size() - 1)
+        {
+            cell = TableMealy[0][1];
+            cell += "/ ";
+            orderedOutputs.insert(orderedOutputs.begin(), cell);
+            i++;
+        }
+    }
+
+    //Создать новые состояния для автомата Мура
+    map<string, string> newStateMap;
     int newStateIndex = 0;
-    stateMap[initialState] = "q0";
-
-    for (auto state : states)
+    for (const auto& combined : orderedOutputs)
     {
-        if (state != initialState && stateMap.find(state) == stateMap.end())
+        string newState = "q" + to_string(newStateIndex++);
+        newStateMap[combined] = newState;
+    }
+
+    //Заполнить верхнюю часть таблицы Мура
+    vector<string> headerRow = { "" }, headerOut = { "" };
+    string first;
+    for (const auto& combined : orderedOutputs) {
+        string newState = newStateMap[combined];
+        string output = combined.substr(combined.find('/') + 1);
+        size_t slash = combined.find('/');
+        first = combined.substr(0, slash);
+        if (first == TableMealy[0][1])
         {
-            stateMap[state] = "q" + to_string(++newStateIndex);
-            orderedStates.push_back(state);
+            headerRow.insert(headerRow.begin() + 1, newState);
+            headerOut.insert(headerOut.begin() + 1, output);
+        }
+        else {
+            headerRow.push_back(newState);
+            headerOut.push_back(output);
         }
     }
-
-    vector<string> headerRow = { "" };
-    for (auto state : orderedStates)
-    {
-        headerRow.push_back(stateOutputs[state]);
-    }
+    result.push_back(headerOut);
     result.push_back(headerRow);
 
-    vector<string> stateNameRow = { "" };
-    for (auto state : orderedStates)
-    {
-        stateNameRow.push_back(stateMap[state]);
-    }
-    result.push_back(stateNameRow);
+    //Заполнить таблицу Мура на основе таблицы Мили
+    unsigned int el = 0;
+    for (size_t i = 1; i < TableMealy.size(); ++i) {
+        vector<string> newRow = { TableMealy[i][0] };
+        newRow.resize(result[1].size());
+        for (size_t j = 1; j < TableMealy[i].size(); ++j) {
+            string cell = TableMealy[i][j],
+                newState = newStateMap[cell];
+            size_t slashPos;
+            string output = TableMealy[0][j];//состояние из начальной таблицы
 
-    for (size_t i = 1; i < TableMealy.size(); ++i)
-    {
-        string currentState = TableMealy[i][0];
-        vector<string> transitionRow = { currentState };
-        for (size_t j = 1; j < TableMealy[i].size(); ++j)
-        {
-            string transition = TableMealy[i][j];
-            size_t slashPos = transition.find('/');
-            string nextState;
-            if (slashPos != string::npos)
-            {
-                nextState = transition.substr(0, slashPos);
+            for (const string& element : orderedOutputs) {
+                cell = element;
+                slashPos = cell.find('/');
+                cell = cell.substr(0, slashPos);//состояние из полученной таблицы
+                el++;
+                if (output == cell)
+                {
+                    newRow[el] = newState;
+                }
             }
-            else
-            {
-                nextState = transition;
-            }
-            transitionRow.push_back(stateMap[nextState]);
+            el=0;
         }
-        result.push_back(transitionRow);
+        result.push_back(newRow);
+        el = 0;
     }
-    return result;
+
+	return result;
 }
 //функция полностью исправна из Мили->Мура
 void RemoveStatesMealy(vector<vector<string>>& TableMealy) {
