@@ -17,7 +17,7 @@ void PrintFile(vector<vector<string>>& TableResult, const string& filename)
     }
 }
 
-//Это Мили
+//ГќГІГ® ГЊГЁГ«ГЁ
 void RemoveStatesMealy(vector<vector<string>>& TableMealy)
 {
     queue<string> stateQueue;
@@ -197,7 +197,7 @@ void MinimizeMealy(vector<vector<string>>& TableMealy)
         GetStateMealy(State, result, newState);
         result = FillTheTableMealy(State, result);
         DeleteStatesMealy(result);
-        if (result.size() == comparison.size())
+        if (result[0].size() == comparison[0].size())
         {
             flag = false;
         }
@@ -206,7 +206,7 @@ void MinimizeMealy(vector<vector<string>>& TableMealy)
     TableMealy = result;
 }
 
-//Это Мур
+//ГќГІГ® ГЊГіГ°
 void GetStateMoore(map<string, string>& State, vector<vector<string>>& Moore, string& newState)
 {
     set<string> Signal;
@@ -244,7 +244,7 @@ vector<vector<string>> FillTheTableMoore(map<string, string>& State, vector<vect
     vector<vector<string>> result;
     string startState = Moore[1][1];
     vector<string> signal = { "" }, headState = { "" };
-    for (auto& combin : State)//заполняю первые две строки у таблицы
+    for (auto& combin : State)//Г§Г ГЇГ®Г«Г­ГїГѕ ГЇГҐГ°ГўГ»ГҐ Г¤ГўГҐ Г±ГІГ°Г®ГЄГЁ Гі ГІГ ГЎГ«ГЁГ¶Г»
     {
         string newState = combin.first;
         string record = newState.substr(0, newState.find('/'));
@@ -325,7 +325,7 @@ void MinimizeMoore(vector<vector<string>>& TableMoore)
         GetStateMoore(State, result, newState);
         result = FillTheTableMoore(State, result);
         DeleteStatesMoore(result);
-        if (result.size() == comparison.size())
+        if (result[0].size() == comparison[0].size())
         {
             flag = false;
         }
@@ -398,7 +398,7 @@ int main(int argc, char* argv[])
     vector<vector<string>> table;
     string line;
 
-    if (workParam == MOORE_TO_MEALY_PARAM)//Мили
+    if (workParam == MOORE_TO_MEALY_PARAM)//ГЊГЁГ«ГЁ
     {
         if (getline(file, line)) {
             vector<string> row;
@@ -437,7 +437,7 @@ int main(int argc, char* argv[])
         MinimizeMealy(table);
         PrintFile(table, outputFile);
     }
-    else//Мур
+    else//ГЊГіГ°
     {
         while (getline(file, line))
         {
