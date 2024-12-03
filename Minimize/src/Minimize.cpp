@@ -438,7 +438,7 @@ int main(int argc, char* argv[])
             table.push_back(row);
         }
         file.close();
-        //RemoveStatesMealy(table);
+        RemoveStatesMealy(table);
         MinimizeMealy(table);
         PrintFile(table, outputFile);
     }
@@ -457,7 +457,7 @@ int main(int argc, char* argv[])
             table.push_back(row);
         }
         file.close();
-        //RemoveStatesMoore(table);
+        RemoveStatesMoore(table);
         MinimizeMoore(table);
         PrintFile(table, outputFile);
     }
