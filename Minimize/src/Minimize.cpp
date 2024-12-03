@@ -22,41 +22,41 @@ void RemoveStatesMealy(vector<vector<string>>& TableMealy)
 {
     queue<string> stateQueue;
     set<string> reachableStates;
+    set<string> markState;//вектор стейтов, в которых уже были
     string currentState;
-    unsigned int i = 1;
+    //unsigned int i = 1;
     reachableStates.insert(TableMealy[0][1]);
     for (int l = 1; l < TableMealy.size(); l++)
     {
         currentState = TableMealy[l][1];
-        size_t slash = currentState.find('/');
-        currentState = currentState.substr(0, slash);
-        stateQueue.push(currentState);
+        currentState = currentState.substr(0, currentState.find('/'));
+        if (markState.find(currentState) == markState.end())
+        {
+            markState.insert(currentState);
+            stateQueue.push(currentState);
+        }
+        
     }
     while (!stateQueue.empty())
     {
         currentState = stateQueue.front();
         stateQueue.pop();
-        i = 1;
-        for (i; i < TableMealy[0].size(); i++)
+        if (reachableStates.find(currentState) == reachableStates.end())
         {
-            if (currentState == TableMealy[0][i])
+            reachableStates.insert(currentState);
+            for (int n = 1; n < TableMealy[0].size(); n++)
             {
-                break;
-            }
-        }
-        for (int l = 1; l < TableMealy[0][i].size(); l++)
-        {
-            if (reachableStates.find(currentState) == reachableStates.end())
-            {
-                reachableStates.insert(currentState);
-                for (int k = 1; k < TableMealy.size(); k++)
+                if (currentState == TableMealy[0][n])
                 {
-                    if (currentState != TableMealy[k][i])
+                    for (int i = 1; i<TableMealy.size(); i++)
                     {
-                        currentState = TableMealy[k][i];
-                        size_t slash = currentState.find('/');
-                        currentState = currentState.substr(0, slash);
-                        stateQueue.push(currentState);
+                        string mark = TableMealy[i][n];
+                        mark = mark.substr(0, mark.find('/'));
+                        if (markState.find(mark) == markState.end())
+                        {
+                            markState.insert(mark);
+                            stateQueue.push(mark);
+                        }
                     }
                 }
             }
