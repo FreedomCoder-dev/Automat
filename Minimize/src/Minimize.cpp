@@ -117,24 +117,26 @@ void GetStateMealy(map<string, string>& State, vector<vector<string>>& Mealy, st
 vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vector<string>>& Mealy)
 {
     vector<vector<string>> result;
-    vector<string> states = { "" };
-    for (auto& combin : State)
+    vector<string> states = {""};
+    for (int k = 1; k < Mealy[0].size(); k++)
     {
-        string nextState = combin.first;
-        nextState = nextState.substr(0, nextState.find('/'));
-        if (nextState == Mealy[0][1])
+        string symbol = Mealy[0][k];
+        for (auto& combin : State)
         {
-            states.insert(states.begin() + 1, combin.second);
-        }
-        else
-        {
-            states.push_back(combin.second);
+            string nextState = combin.first;
+            nextState = nextState.substr(0, nextState.find('/'));
+            if(nextState == symbol)
+            {
+                states.push_back(combin.second);
+                break;
+            }
         }
     }
+
     result.push_back(states);
     for (int i = 1; i < Mealy.size(); i++)
     {
-        states = { Mealy[i][0] };
+        states = { Mealy[i][0]};
         for (int l = 1; l < Mealy[0].size(); l++)
         {
             string nextStates = Mealy[i][l];
@@ -165,7 +167,10 @@ void DeleteStatesMealy(vector<vector<string>>& result)
         string nightState = "";
         for (int l = 0; l < result.size(); l++)
         {
-            nightState += result[l][i];
+            string rel = result[l][i];
+            rel = rel.substr(rel.find('/') + 1);
+            nightState += rel;
+            //nightState += result[l][i];
         }
         if (signal.find(nightState) == signal.end())
         {
