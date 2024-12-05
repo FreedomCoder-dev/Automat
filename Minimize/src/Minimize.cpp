@@ -24,7 +24,6 @@ void RemoveStatesMealy(vector<vector<string>>& TableMealy)
     set<string> reachableStates;
     set<string> markState;//вектор стейтов, в которых уже были
     string currentState;
-    //unsigned int i = 1;
     reachableStates.insert(TableMealy[0][1]);
     for (int l = 1; l < TableMealy.size(); l++)
     {
@@ -89,7 +88,14 @@ void GetStateMealy(map<string, string>& State, vector<vector<string>>& Mealy, st
         for (int i = 1; i < Mealy.size(); i++)
         {
             states = Mealy[i][l];
-            states = states.substr(states.find('/') + 1);
+            if (newState == "A")
+            {
+                states = states.substr(states.find('/') + 1);
+            }
+            else
+            {
+                states = states.substr(0, states.find('/'));
+            }
             record += states + ',';
         }
         if (Signal.find(record) == Signal.end())
@@ -158,19 +164,24 @@ vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vect
     return result;
 }
 
-void DeleteStatesMealy(vector<vector<string>>& result)
+void DeleteStatesMealy(vector<vector<string>>& result, string& State)
 {
     map<string, string> newState;
     set<string> signal;
     for (int i = 1; i < result[0].size(); i++)
     {
         string nightState = "";
-        for (int l = 0; l < result.size(); l++)
+        for (int l = 1; l < result.size(); l++)
         {
             string rel = result[l][i];
-            rel = rel.substr(rel.find('/') + 1);
+            if (State == "A")
+            {
+                rel = rel.substr(rel.find('/') + 1);
+            }
+            else {
+                rel = rel.substr(0, rel.find('/'));
+            }
             nightState += rel;
-            //nightState += result[l][i];
         }
         if (signal.find(nightState) == signal.end())
         {
@@ -193,7 +204,7 @@ void MinimizeMealy(vector<vector<string>>& TableMealy)
     string newState = "A";
     GetStateMealy(State, TableMealy, newState);
     vector<vector<string>> result = FillTheTableMealy(State, TableMealy);
-    DeleteStatesMealy(result);
+    //DeleteStatesMealy(result, newState);
     vector<vector<string>> comparison = result;
     bool flag = true;
     while (flag)
@@ -201,7 +212,7 @@ void MinimizeMealy(vector<vector<string>>& TableMealy)
         State.clear();
         GetStateMealy(State, result, newState);
         result = FillTheTableMealy(State, result);
-        DeleteStatesMealy(result);
+        DeleteStatesMealy(result, newState);
         if (result[0].size() == comparison[0].size())
         {
             flag = false;
