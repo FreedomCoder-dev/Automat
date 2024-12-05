@@ -152,7 +152,7 @@ vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vect
             {
                 string fillState = combin.first;
                 fillState = fillState.substr(0, fillState.find('/'));
-                if (fillState == nextStates)
+                if ((fillState == nextStates) || (Mealy[0].size() == 2))
                 {
                     states.push_back(combin.second + "/" + signal);
                     break;
