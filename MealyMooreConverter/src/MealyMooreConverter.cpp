@@ -254,45 +254,44 @@ vector<vector<string>> ProcessMoore(vector<vector<string>>& TableMoore, string n
     return result;
 }
 //функция полностью исправна из Мура->Мили
-void RemoveStatesMoore(vector<vector<string>>& TableMoore) 
+void RemoveStatesMoore(vector<vector<string>>& TableMealy) 
 {  
     queue<string> stateQueue;
     set<string> reachableStates;
+    set<string> markState;//вектор стейтов, в которых уже были
     string currentState;
-    unsigned int i = 1;
-    reachableStates.insert(TableMoore[0][1]);
-    for (int l = 1; l < TableMoore.size(); l++)
+    reachableStates.insert(TableMealy[0][1]);
+    for (int l = 1; l < TableMealy.size(); l++)
     {
-        currentState = TableMoore[l][1];
-        size_t slash = currentState.find('/');
-        currentState = currentState.substr(0, slash);
-        stateQueue.push(currentState);
+        currentState = TableMealy[l][1];
+        currentState = currentState.substr(0, currentState.find('/'));
+        if (markState.find(currentState) == markState.end())
+        {
+            markState.insert(currentState);
+            stateQueue.push(currentState);
+        }
+        
     }
     while (!stateQueue.empty())
     {
         currentState = stateQueue.front();
         stateQueue.pop();
-        i = 1;
-        for (i; i < TableMoore[0].size(); i++)
+        if (reachableStates.find(currentState) == reachableStates.end())
         {
-            if (currentState == TableMoore[0][i])
+            reachableStates.insert(currentState);
+            for (int n = 1; n < TableMealy[0].size(); n++)
             {
-                break;
-            }
-        }
-        for (int l = 1; l < TableMoore[0][i].size(); l++)
-        {
-            if (reachableStates.find(currentState) == reachableStates.end())
-            {
-                reachableStates.insert(currentState);
-                for (int k = 1; k < TableMoore.size(); k++)
+                if (currentState == TableMealy[0][n])
                 {
-                    if (currentState != TableMoore[k][i])
+                    for (int i = 1; i<TableMealy.size(); i++)
                     {
-                        currentState = TableMoore[k][i];
-                        size_t slash = currentState.find('/');
-                        currentState = currentState.substr(0, slash);
-                        stateQueue.push(currentState);
+                        string mark = TableMealy[i][n];
+                        mark = mark.substr(0, mark.find('/'));
+                        if (markState.find(mark) == markState.end())
+                        {
+                            markState.insert(mark);
+                            stateQueue.push(mark);
+                        }
                     }
                 }
             }
@@ -300,14 +299,14 @@ void RemoveStatesMoore(vector<vector<string>>& TableMoore)
     }
     for (int l = 0; l < 1; l++)
     {
-        for (int k = 1; k < TableMoore[0].size(); k++)
+        for (int k = 1; k < TableMealy[0].size(); k++)
         {
-            currentState = TableMoore[l][k];
+            currentState = TableMealy[l][k];
             if (reachableStates.find(currentState) == reachableStates.end())
             {
-                for (int m = 0; m < TableMoore.size(); m++)
+                for (int m = 0; m < TableMealy.size(); m++)
                 {
-                    TableMoore[m].erase(TableMoore[m].begin() + k);
+                    TableMealy[m].erase(TableMealy[m].begin() + k);
                 }
                 k--;
             }
@@ -382,8 +381,8 @@ int main(int argc, char* argv[])
             table.push_back(row);
         }
         file.close();
-	    vector<vector<string>> resultTable = ProcessMoore(table);
-        RemoveStatesMoore(resultTable);
+	vector<vector<string>> resultTable = ProcessMoore(table);
+        RemoveStatesMoore(resultTable);//уже поменял 09.12.2024
         DeleteStatesMoore(resultTable);
         PrintFile(resultTable, outputFile);
     }
