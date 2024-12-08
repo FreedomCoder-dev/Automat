@@ -18,6 +18,66 @@ void PrintFile(vector<vector<string>>& TableResult, const string& filename)
 }
 
 //Ýòî Ìèëè
+void RemoveStatesMealy(vector<vector<string>>& TableMealy)
+{
+    queue<string> stateQueue;
+    set<string> reachableStates;
+    set<string> markState;//вектор стейтов, в которых уже были
+    string currentState;
+    reachableStates.insert(TableMealy[0][1]);
+    for (int l = 1; l < TableMealy.size(); l++)
+    {
+        currentState = TableMealy[l][1];
+        currentState = currentState.substr(0, currentState.find('/'));
+        if (markState.find(currentState) == markState.end())
+        {
+            markState.insert(currentState);
+            stateQueue.push(currentState);
+        }
+        
+    }
+    while (!stateQueue.empty())
+    {
+        currentState = stateQueue.front();
+        stateQueue.pop();
+        if (reachableStates.find(currentState) == reachableStates.end())
+        {
+            reachableStates.insert(currentState);
+            for (int n = 1; n < TableMealy[0].size(); n++)
+            {
+                if (currentState == TableMealy[0][n])
+                {
+                    for (int i = 1; i<TableMealy.size(); i++)
+                    {
+                        string mark = TableMealy[i][n];
+                        mark = mark.substr(0, mark.find('/'));
+                        if (markState.find(mark) == markState.end())
+                        {
+                            markState.insert(mark);
+                            stateQueue.push(mark);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    for (int l = 0; l < 1; l++)
+    {
+        for (int k = 1; k < TableMealy[0].size(); k++)
+        {
+            currentState = TableMealy[l][k];
+            if (reachableStates.find(currentState) == reachableStates.end())
+            {
+                for (int m = 0; m < TableMealy.size(); m++)
+                {
+                    TableMealy[m].erase(TableMealy[m].begin() + k);
+                }
+                k--;
+            }
+        }
+    }
+}
+
 void GetStateMealyOne(map<string, string>& State, vector<vector<string>>& Mealy, string& newState)
 {
     set<string> Signal;
