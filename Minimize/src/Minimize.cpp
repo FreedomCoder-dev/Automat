@@ -18,66 +18,6 @@ void PrintFile(vector<vector<string>>& TableResult, const string& filename)
 }
 
 //Ýòî Ìèëè
-void RemoveStatesMealy(vector<vector<string>>& TableMealy)
-{
-    queue<string> stateQueue;
-    set<string> reachableStates;
-    set<string> markState;//вектор стейтов, в которых уже были
-    string currentState;
-    reachableStates.insert(TableMealy[0][1]);
-    for (int l = 1; l < TableMealy.size(); l++)
-    {
-        currentState = TableMealy[l][1];
-        currentState = currentState.substr(0, currentState.find('/'));
-        if (markState.find(currentState) == markState.end())
-        {
-            markState.insert(currentState);
-            stateQueue.push(currentState);
-        }
-        
-    }
-    while (!stateQueue.empty())
-    {
-        currentState = stateQueue.front();
-        stateQueue.pop();
-        if (reachableStates.find(currentState) == reachableStates.end())
-        {
-            reachableStates.insert(currentState);
-            for (int n = 1; n < TableMealy[0].size(); n++)
-            {
-                if (currentState == TableMealy[0][n])
-                {
-                    for (int i = 1; i<TableMealy.size(); i++)
-                    {
-                        string mark = TableMealy[i][n];
-                        mark = mark.substr(0, mark.find('/'));
-                        if (markState.find(mark) == markState.end())
-                        {
-                            markState.insert(mark);
-                            stateQueue.push(mark);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    for (int l = 0; l < 1; l++)
-    {
-        for (int k = 1; k < TableMealy[0].size(); k++)
-        {
-            currentState = TableMealy[l][k];
-            if (reachableStates.find(currentState) == reachableStates.end())
-            {
-                for (int m = 0; m < TableMealy.size(); m++)
-                {
-                    TableMealy[m].erase(TableMealy[m].begin() + k);
-                }
-                k--;
-            }
-        }
-    }
-}
-
 void GetStateMealyOne(map<string, string>& State, vector<vector<string>>& Mealy, string& newState)
 {
     set<string> Signal;
@@ -172,26 +112,25 @@ void GetStateMealy(map<string, string>& State, vector<vector<string>>& Mealy, st
     for (int l = 1; l < Mealy[0].size(); l++)
     {
         string states = "", record = "";
-        for (int i = 0; i < Mealy.size(); i++)
+        for (int i = 2; i < Mealy.size(); i++)
         {
-            if (i == 1) continue;
             states = Mealy[i][l];
             record += states + ',';
         }
         if (Signal.find(record) == Signal.end())
         {
             Signal.insert(record);
-            State[newState + to_string(count)] = Mealy[0][l] + "/" + record;
+            State[Mealy[0][l] + "/" + record] = newState + to_string(count);
             count++;
         }
         else {
             for (auto& combin : State)
             {
-                string newState = combin.second;
+                string newState = combin.first;
                 newState = newState.substr(newState.find('/') + 1);
                 if (newState == record)
                 {
-                    State[combin.first] = Mealy[0][l] + "/" + record;
+                    State[Mealy[0][l] + "/" + record] = combin.second;
                     break;
                 }
             }
@@ -206,15 +145,21 @@ vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vect
     vector<string> states = { "" }, mealyState = { "" };
     for (int k = 1; k < Mealy[0].size(); k++)
     {
-        string symbol = Mealy[0][k];
         for (auto& combin : State)
         {
-            string nextState = combin.second;
-            nextState = nextState.substr(0, nextState.find('/'));
-            if (nextState == symbol)
+            string symbol = "";
+            for (int m = 2; m < Mealy.size(); m++)
+            {
+                if (m == 1) continue;
+                symbol += Mealy[m][k] + ",";
+            }
+            string rel = combin.first;
+            rel = rel.substr(combin.first.find('/') + 1);
+            if (symbol == rel)
             {
                 mealyState.push_back(Mealy[1][k]);
-                states.push_back(combin.first);
+                //states.push_back(combin.first);
+                states.push_back(combin.second);
                 break;
             }
         }
@@ -231,18 +176,17 @@ vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vect
             string nextStates = Mealy[i][l];
             for (auto& combin : State)
             {
-                string fillState = combin.second;
+                string fillState = combin.first;
                 fillState = fillState.substr(0, fillState.find('/'));
                 if ((fillState == nextStates) || (Mealy[0].size() == 2))
                 {
-                    states.push_back(combin.first);
+                    states.push_back(combin.second);
                     break;
                 }
             }
         }
         result.push_back(states);
     }
-
     return result;
 }
 
@@ -269,12 +213,15 @@ void DeleteStatesMealy(vector<vector<string>>& result, unsigned int& countState,
         if (signal.find(nightState) == signal.end())
         {
             signal.insert(nightState);
-
         }
         else
         {
             for (int k = 0; k < result.size(); k++)
             {
+                if (signalState.find(result[k][i]) != signalState.end())
+                {
+                    signalState.erase(result[k][i]);
+                }
                 result[k].erase(result[k].begin() + i);
             }
             i--;
@@ -291,7 +238,7 @@ void DeleteStatesMealy(vector<vector<string>>& result, unsigned int& countState,
         {
             string signalStr = Mealy[i][l];
             signalStr = signalStr.substr(signalStr.find('/') + 1);
-            if (signalState.find(Mealy[i][l]) == signalState.end())
+            if (signalState.find(Mealy[0][l]) != signalState.end())
             {
                 for (auto& combin : State)
                 {
@@ -299,11 +246,6 @@ void DeleteStatesMealy(vector<vector<string>>& result, unsigned int& countState,
                     rel = rel.substr(0, rel.find('/'));
                     string cel = combin.second;
                     if (cel.find(rel) != std::string::npos)
-                    {
-                        size_t slash = cel.find(rel);
-                        cel = cel.substr(slash, cel.find(','));
-                    }
-                    if (rel == cel)
                     {
                         fillResultMealy.push_back(combin.first + "/" + signalStr);
                         break;
@@ -335,7 +277,7 @@ void MinimizeMealy(vector<vector<string>>& TableMealy)
         }
         countState = State.size();
     }
-    DeleteStatesMealy(result, countState, TableMealy);
+    DeleteStatesMealy(result, countState, TableMealy);//доделать функцию
 }
 
 //Ýòî Ìóð
