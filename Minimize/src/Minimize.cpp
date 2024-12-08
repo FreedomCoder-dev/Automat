@@ -172,23 +172,25 @@ void GetStateMealy(map<string, string>& State, vector<vector<string>>& Mealy, st
     for (int l = 1; l < Mealy[0].size(); l++)
     {
         string states = "", record = "";
-        for (int i = 2; i < Mealy.size(); i++)
+        for (int i = 0; i < Mealy.size(); i++)
         {
+            if (i == 1) continue;
             states = Mealy[i][l];
             record += states + ',';
         }
         if (Signal.find(record) == Signal.end())
         {
             Signal.insert(record);
+            record = record.substr(record.find(',') + 1);
             State[Mealy[0][l] + "/" + record] = newState + to_string(count);
             count++;
         }
         else {
             for (auto& combin : State)
             {
-                string newState = combin.first;
-                newState = newState.substr(newState.find('/') + 1);
-                if (newState == record)
+                string newStates = combin.first;
+                newStates = newStates.substr(newStates.find('/') + 1);
+                if (newStates == record)
                 {
                     State[Mealy[0][l] + "/" + record] = combin.second;
                     break;
@@ -208,17 +210,20 @@ vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vect
         for (auto& combin : State)
         {
             string symbol = "";
-            for (int m = 2; m < Mealy.size(); m++)
+            for (int m = 0; m < Mealy.size(); m++)
             {
+                if (m == 0)
+                {
+                    symbol += Mealy[m][k] + '/';
+                    continue;
+                }
                 if (m == 1) continue;
                 symbol += Mealy[m][k] + ",";
             }
             string rel = combin.first;
-            rel = rel.substr(combin.first.find('/') + 1);
-            if (symbol == rel)
+            if (rel.find(symbol) != std::string::npos)
             {
                 mealyState.push_back(Mealy[1][k]);
-                //states.push_back(combin.first);
                 states.push_back(combin.second);
                 break;
             }
@@ -247,6 +252,7 @@ vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vect
         }
         result.push_back(states);
     }
+
     return result;
 }
 
