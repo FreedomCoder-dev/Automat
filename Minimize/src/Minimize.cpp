@@ -201,10 +201,11 @@ void GetStateMealy(map<string, string>& State, vector<vector<string>>& Mealy, st
     newState[0] = newState[0] + 1;
 }
 
-vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vector<string>>& Mealy)
+vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vector<string>>& Mealy, vector<vector<string>>& fixMealy)
 {
     vector<vector<string>> result;
     vector<string> states = { "" }, mealyState = { "" };
+    map<string, string> fixState;
     for (int k = 1; k < Mealy[0].size(); k++)
     {
         for (auto& combin : State)
@@ -225,6 +226,7 @@ vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vect
             {
                 mealyState.push_back(Mealy[1][k]);
                 states.push_back(combin.second);
+                fixState[Mealy[1][k]] = combin.second;
                 break;
             }
         }
@@ -233,17 +235,16 @@ vector<vector<string>> FillTheTableMealy(map<string, string>& State, vector<vect
     result.push_back(states);
     result.push_back(mealyState);
 
-    for (int i = 2; i < Mealy.size(); i++)
+    for (int i = 1; i < fixMealy.size(); i++)
     {
-        states = { Mealy[i][0] };
-        for (int l = 1; l < Mealy[0].size(); l++)
+        states = { fixMealy[i][0] };
+        for (int l = 1; l < fixMealy[0].size(); l++)
         {
-            string nextStates = Mealy[i][l];
-            for (auto& combin : State)
+            string nextStates = fixMealy[i][l];
+            nextStates = nextStates.substr(0, nextStates.find('/'));
+            for (auto& combin : fixState)
             {
-                string fillState = combin.first;
-                fillState = fillState.substr(0, fillState.find('/'));
-                if ((fillState == nextStates) || (Mealy[0].size() == 2))
+                if (nextStates == combin.first)
                 {
                     states.push_back(combin.second);
                     break;
@@ -336,7 +337,7 @@ void MinimizeMealy(vector<vector<string>>& TableMealy)
     {
         State.clear();
         GetStateMealy(State, result, newState);
-        result = FillTheTableMealy(State, result);
+        result = FillTheTableMealy(State, result, TableMealy);
         if (State.size() == countState)
         {
             flag = false;
