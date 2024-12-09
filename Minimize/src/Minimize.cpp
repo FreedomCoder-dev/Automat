@@ -602,12 +602,34 @@ void MinimizeMoore(vector<vector<string>>& TableMoore)//доделать мин�
     bool flag = true;
     while (flag)
     {
+        vector<vector<string>> compare = result;
         State.clear();
         GetStateMoore(State, result, newState);
         result = FillTheTableMoore(State, result, TableMoore);
         if (State.size() == countState)
         {
-            flag = false;
+            for (int i = 1; i < result[0].size(); i++)
+            {
+                string resultRec = "", compareRec = "";
+                for (int l = 0; l < result.size(); l++)
+                {
+                    if (l == 1) continue;
+                    resultRec += result[l][i];
+                    compareRec += compare[l][i];
+
+                }
+                resultRec.erase(std::remove_if(resultRec.begin(), resultRec.end(), ::isalpha), resultRec.end());
+                compareRec.erase(std::remove_if(compareRec.begin(), compareRec.end(), ::isalpha), compareRec.end());
+                if (resultRec != compareRec)
+                {
+                    flag = true;
+                    break;
+                }
+                else
+                {
+                    flag = false;
+                }
+            }
         }
         countState = State.size();
     }
