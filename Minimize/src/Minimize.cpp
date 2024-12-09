@@ -617,8 +617,8 @@ void MinimizeMoore(vector<vector<string>>& TableMoore)//доделать мин�
                     resultRec += result[l][i];
                     compareRec += compare[l][i];
                 }
-                resultRec.erase(std::remove_if(resultRec.begin(), resultRec.end(), ::isalpha), resultRec.end());
-                compareRec.erase(std::remove_if(compareRec.begin(), compareRec.end(), ::isalpha), compareRec.end());
+                resultRec.erase(remove_if(resultRec.begin(), resultRec.end(), ::isalpha), resultRec.end());
+                compareRec.erase(remove_if(compareRec.begin(), compareRec.end(), ::isalpha), compareRec.end());
                 if (resultRec != compareRec)
                 {
                     flag = true;
