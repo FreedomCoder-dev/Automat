@@ -348,7 +348,7 @@ void MinimizeMealy(vector<vector<string>>& TableMealy)
 }
 
 //Ýòî Ìóð
-void GetStateMoore(map<string, string>& State, vector<vector<string>>& Moore, string& newState)
+void GetStateMooreOne(map<string, string>& State, vector<vector<string>>& Moore, string& newState)
 {
     set<string> Signal;
     unsigned int count = 1;
@@ -380,29 +380,29 @@ void GetStateMoore(map<string, string>& State, vector<vector<string>>& Moore, st
     newState[0] = newState[0] + 1;
 }
 
-vector<vector<string>> FillTheTableMoore(map<string, string>& State, vector<vector<string>>& Moore)
+vector<vector<string>> FillTheTableMooreOne(map<string, string>& State, vector<vector<string>>& Moore)
 {
     vector<vector<string>> result;
-    string startState = Moore[1][1];
     vector<string> signal = { "" }, headState = { "" };
-    for (auto& combin : State)//çàïîëíÿþ ïåðâûå äâå ñòðîêè ó òàáëèöû
+    for (int i = 1; i < Moore[0].size(); i++)
     {
-        string newState = combin.first;
-        string record = newState.substr(0, newState.find('/'));
-        newState = newState.substr(newState.find('/') + 1);
-        if (startState == record)
+        string startState = Moore[1][i];
+        for (auto& combin : State)
         {
-            signal.insert(signal.begin() + 1, newState);
-            headState.insert(headState.begin() + 1, combin.second);
-        }
-        else
-        {
-            signal.push_back(newState);
-            headState.push_back(combin.second);
+            string newState = combin.first;
+            newState = newState.substr(0, newState.find('/'));
+            if (startState == newState)
+            {
+                signal.push_back(combin.second);
+                headState.push_back(startState);
+                break;
+            }
         }
     }
+
     result.push_back(signal);
     result.push_back(headState);
+
     for (int i = 2; i < Moore.size(); i++)
     {
         vector<string> fill = { Moore[i][0] };
@@ -412,8 +412,8 @@ vector<vector<string>> FillTheTableMoore(map<string, string>& State, vector<vect
             for (auto& combin : State)
             {
                 string newState = combin.first;
-                string record = newState.substr(0, newState.find('/'));
-                if (fillState == record)
+                newState = newState.substr(0, newState.find('/'));
+                if (fillState == newState)
                 {
                     fill.push_back(combin.second);
                     break;
@@ -425,16 +425,107 @@ vector<vector<string>> FillTheTableMoore(map<string, string>& State, vector<vect
     return result;
 }
 
-void DeleteStatesMoore(vector<vector<string>>& result)
+void GetStateMoore(map<string, string>& State, vector<vector<string>>& Moore, string& newState)
+{
+    set<string> Signal;
+    unsigned int count = 1;
+    for (int l = 1; l < Moore[0].size(); l++)
+    {
+        string state = "", newSignal = "";
+        for (int k = 0; k < Moore.size(); k++)
+        {
+            if (k == 1) continue;
+            state += Moore[k][l] + ',';
+        }
+        if (Signal.find(state) == Signal.end())
+        {
+            Signal.insert(state);
+            state = state.substr(state.find('/') + 1);
+            State[Moore[1][l] + '/' + state] = newState + to_string(count);
+            count++;
+        }
+        else {
+            for (auto& combin : State)
+            {
+                newSignal = combin.first;
+                if (newSignal == state)
+                {
+                    state = state.substr(state.find('/') + 1);
+                    State[Moore[1][l] + state] = newState + to_string(count);
+                    break;
+                }
+            }
+        }
+    }
+    newState[0] = newState[0] + 1;
+}
+
+vector<vector<string>> FillTheTableMoore(map<string, string>& State, vector<vector<string>>& Moore, vector<vector<string>>& fixMoore)
+{
+    vector<vector<string>> result;
+    vector<string> signal = { "" }, headState = { "" };
+    map<string, string> fixState;
+    for (int i = 1; i < Moore[0].size(); i++)
+    {
+        string startState = Moore[1][i];
+        for (auto& combin : State)
+        {
+            string newState = combin.first;
+            newState = newState.substr(0, newState.find('/'));
+            if (startState == newState)
+            {
+                signal.push_back(combin.second);
+                headState.push_back(startState);
+                fixState[combin.second] = Moore[0][i];
+                break;
+            }
+        }
+    }
+
+    result.push_back(signal);
+    result.push_back(headState);
+
+    for (int i = 2; i < Moore.size(); i++)
+    {
+        vector<string> fill = { Moore[i][0] };
+        for (int l = 1; l < Moore[0].size(); l++)
+        {
+            string fillState = fixMoore[i][l];
+            for (auto& combin : State)
+            {
+                string newState = combin.first;
+                newState = newState.substr(0, newState.find('/'));
+                if (fillState == newState)
+                {
+                    fill.push_back(combin.second);
+                    break;
+                }
+            }
+        }
+        result.push_back(fill);
+    }
+    return result;
+}
+
+void DeleteStatesMoore(vector<vector<string>>& result, unsigned int& count, vector<vector<string>>& Moore)
 {
     map<string, string> newState;
     set<string> signal;
+    set<string> signalState;
+    map<string, string> State;
     for (int i = 1; i < result[0].size(); i++)
     {
         string nightState = "";
-        for (int l = 1; l < result.size(); l++)
+        for (int l = 0; l < result.size(); l++)
         {
-            nightState += result[l][i];
+            if (l == 1)
+            {
+                State[nightState] += result[l][i] + ",";
+                signalState.insert(result[l][i]);
+                continue;
+            }
+            string rel = result[l][i];
+            nightState += rel;
         }
         if (signal.find(nightState) == signal.end())
         {
@@ -444,35 +535,82 @@ void DeleteStatesMoore(vector<vector<string>>& result)
         {
             for (int k = 0; k < result.size(); k++)
             {
+                if (signalState.find(result[k][i]) != signalState.end())
+                {
+                    signalState.erase(result[k][i]);
+                }
                 result[k].erase(result[k].begin() + i);
             }
             i--;
         }
     }
+    vector<vector<string>> newResultMoore;
+    vector<string> fillResultMoore;
+    vector<string> signalMoore;
+    for (int l = 1; l < Moore[0].size(); l++)
+    {
+        string state = Moore[1][l];
+        for (auto& combin : State)
+        {
+            string signal_m = combin.second;
+            if (signal_m.find(state) != std::string::npos)
+            {
+                if (signalState.find(state) != signalState.end())
+                {
+                    signalMoore.push_back(Moore[0][l]);
+                    fillResultMoore.push_back(combin.first);
+                }
+                break;
+            }
+        }
+    }
+    newResultMoore.push_back(signalMoore);
+    newResultMoore.push_back(fillResultMoore);
+    for (int i = 2; i < Moore.size(); i++)
+    {
+        fillResultMoore = { Moore[i][0] };
+        for (int l = 1; l < result[0].size(); l++)
+        {
+            string signalStr = Moore[i][l];
+            if (signalState.find(Moore[1][l]) != signalState.end())
+            {
+                for (auto& combin : State)
+                {
+                    string rel = Moore[i][l];
+                    string cel = combin.second;
+                    if (cel.find(rel) != std::string::npos)
+                    {
+                        fillResultMoore.push_back(combin.first);
+                        break;
+                    }
+                }
+            }
+        }
+        newResultMoore.push_back(fillResultMoore);
+    }
+    Moore = newResultMoore;
 }
 
-void MinimizeMoore(vector<vector<string>>& TableMoore)
+void MinimizeMoore(vector<vector<string>>& TableMoore)//доделать минимизацию Мура
 {
     map<string, string> State;
     string newState = "A";
-    GetStateMoore(State, TableMoore, newState);
-    vector<vector<string>> result = FillTheTableMoore(State, TableMoore);
-    DeleteStatesMoore(result);
-    vector<vector<string>> comparison = result;
+    GetStateMooreOne(State, TableMoore, newState);
+    vector<vector<string>> result = FillTheTableMooreOne(State, TableMoore);
+    unsigned int countState = State.size();
     bool flag = true;
     while (flag)
     {
         State.clear();
         GetStateMoore(State, result, newState);
-        result = FillTheTableMoore(State, result);
-        DeleteStatesMoore(result);
-        if (result[0].size() == comparison[0].size())
+        result = FillTheTableMoore(State, result, TableMoore);
+        if (State.size() == countState)
         {
             flag = false;
         }
-        comparison = result;
+        countState = State.size();
     }
-    TableMoore = result;
+    DeleteStatesMoore(result, countState, TableMoore);
 }
 
 void RemoveStatesMoore(vector<vector<string>>& TableMoore) {
