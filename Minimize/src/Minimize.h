@@ -8,4 +8,6 @@
 #include <unordered_set>
 #include <queue>
 #include <set>
+#include <algorithm>
+#include <cctype>
 using namespace std;
