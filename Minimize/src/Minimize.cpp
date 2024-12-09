@@ -440,7 +440,7 @@ void GetStateMoore(map<string, string>& State, vector<vector<string>>& Moore, st
         if (Signal.find(state) == Signal.end())
         {
             Signal.insert(state);
-            state = state.substr(state.find('/') + 1);
+            //state = state.substr(state.find(',') + 1);
             State[Moore[1][l] + '/' + state] = newState + to_string(count);
             count++;
         }
@@ -448,10 +448,11 @@ void GetStateMoore(map<string, string>& State, vector<vector<string>>& Moore, st
             for (auto& combin : State)
             {
                 newSignal = combin.first;
+                newSignal = newSignal.substr(newSignal.find('/') + 1);
                 if (newSignal == state)
                 {
-                    state = state.substr(state.find('/') + 1);
-                    State[Moore[1][l] + state] = newState + to_string(count);
+                    //state = state.substr(state.find('/') + 1);
+                    State[Moore[1][l] + '/' + state] = combin.second;
                     break;
                 }
             }
