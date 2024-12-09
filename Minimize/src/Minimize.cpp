@@ -545,8 +545,8 @@ void DeleteStatesMoore(vector<vector<string>>& result, unsigned int& count, vect
         }
     }
     vector<vector<string>> newResultMoore;
-    vector<string> fillResultMoore;
-    vector<string> signalMoore;
+    vector<string> fillResultMoore = { "" };
+    vector<string> signalMoore = { "" };
     for (int l = 1; l < Moore[0].size(); l++)
     {
         string state = Moore[1][l];
