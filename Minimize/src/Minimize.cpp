@@ -554,7 +554,9 @@ void DeleteStatesMoore(vector<vector<string>>& result, unsigned int& count, vect
         for (auto& combin : State)
         {
             string signal_m = combin.second;
-            if (signal_m.find(state) != std::string::npos)
+            std::regex stateRegex("\\b" + state + "\\b");
+            //if (signal_m.find(state) != std::string::npos)
+            if (std::regex_search(signal_m, stateRegex))
             {
                 if (signalState.find(state) != signalState.end())
                 {
@@ -616,6 +618,7 @@ void MinimizeMoore(vector<vector<string>>& TableMoore)//доделать мин�
                     if (l == 1) continue;
                     resultRec += result[l][i];
                     compareRec += compare[l][i];
+
                 }
                 resultRec.erase(remove_if(resultRec.begin(), resultRec.end(), ::isalpha), resultRec.end());
                 compareRec.erase(remove_if(compareRec.begin(), compareRec.end(), ::isalpha), compareRec.end());
