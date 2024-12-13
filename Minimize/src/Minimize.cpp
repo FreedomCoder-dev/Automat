@@ -555,7 +555,6 @@ void DeleteStatesMoore(vector<vector<string>>& result, unsigned int& count, vect
         {
             string signal_m = combin.second;
             std::regex stateRegex("\\b" + state + "\\b");
-            //if (signal_m.find(state) != std::string::npos)
             if (std::regex_search(signal_m, stateRegex))
             {
                 if (signalState.find(state) != signalState.end())
@@ -572,7 +571,7 @@ void DeleteStatesMoore(vector<vector<string>>& result, unsigned int& count, vect
     for (int i = 2; i < Moore.size(); i++)
     {
         fillResultMoore = { Moore[i][0] };
-        for (int l = 1; l < result[0].size(); l++)
+        for (int l = 1; l < Moore[0].size(); l++)
         {
             string signalStr = Moore[i][l];
             if (signalState.find(Moore[1][l]) != signalState.end())
