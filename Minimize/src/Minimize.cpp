@@ -301,7 +301,7 @@ void DeleteStatesMealy(vector<vector<string>>& result, unsigned int& countState,
     for (int i = 1; i < Mealy.size(); i++)
     {
         fillResultMealy = { Mealy[i][0] };   
-        for (int l = 1; l < result[0].size(); l++)
+        for (int l = 1; l < Mealy[0].size(); l++)
         {
             string signalStr = Mealy[i][l];
             signalStr = signalStr.substr(signalStr.find('/') + 1);
