@@ -56,7 +56,7 @@ vector<string> CombinedLines(const vector<string>& lines)
 		{
 			continue;
 		}
-		
+
 		if (regex_search(line, rulePattern))
 		{
 			if (!currentLine.empty())
@@ -158,9 +158,9 @@ void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>&
 	{
 		wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
 		wstring wstr = converter.from_bytes(line);
-		
+
 		if (!regex_match(wstr, grammarPatternLR)) continue;
-		wsmatch match;		
+		wsmatch match;
 		if ((!regex_match(wstr, match, grammarPatternLR))) continue;
 
 		wstring stateLR = match[1];
@@ -170,11 +170,11 @@ void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>&
 		string transitions = converter.to_bytes(transitionsLR);
 
 		if (grammar.Productions.find(state) == grammar.Productions.end()) {
-			grammar.Productions[state] = map<string, vector<string>>();	
+			grammar.Productions[state] = map<string, vector<string>>();
 		}
 
 		statesGrammar.push_back(state);
-		
+
 		if (grammar.FinaleState.empty()) {
 			grammar.FinaleState = state;
 		}
@@ -321,7 +321,7 @@ void WriteToFile(const vector<string>& statesGrammar, const vector<string>& line
 
 	//Создаём строки для CSV
 	vector<vector<string>> rows;
-	for (const auto& symbol : symbols) 
+	for (const auto& symbol : symbols)
 	{
 		vector<string> row = { symbol };
 		for (const auto& state : statesGrammar)
@@ -364,7 +364,7 @@ int main(int argc, char* argv[])
 	vector<string> statesGrammar;
 
 	if (grammar.Type == GrammarType::LeftSided) {
-		ParseLeftHandedGrammar(statesGrammar,  combinedLines, grammar);
+		ParseLeftHandedGrammar(statesGrammar, combinedLines, grammar);
 	}
 	else if (grammar.Type == GrammarType::RightSided) {
 		ParseRightHandedGrammar(statesGrammar, combinedLines, grammar);
