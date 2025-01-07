@@ -160,13 +160,8 @@ void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>&
 		wstring wstr = converter.from_bytes(line);
 		
 		if (!regex_match(wstr, grammarPatternLR)) continue;
-
-		//if (!regex_match(line, grammarPattern)) continue;
-
-		wsmatch match;
-		
+		wsmatch match;		
 		if ((!regex_match(wstr, match, grammarPatternLR))) continue;
-		//if ((!regex_match(line, match, grammarPattern)) ) continue;
 
 		wstring stateLR = match[1];
 		string state = converter.to_bytes(stateLR);
@@ -175,15 +170,13 @@ void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>&
 		string transitions = converter.to_bytes(transitionsLR);
 
 		if (grammar.Productions.find(state) == grammar.Productions.end()) {
-			grammar.Productions[state] = map<string, vector<string>>();
+			grammar.Productions[state] = map<string, vector<string>>();	
 		}
 
+		statesGrammar.push_back(state);
+		
 		if (grammar.FinaleState.empty()) {
 			grammar.FinaleState = state;
-		}
-
-		if (grammar.Productions.find(state) == grammar.Productions.end()) {
-			grammar.Productions[state] = map<string, vector<string>>();
 		}
 
 		size_t pos = 0;
@@ -220,6 +213,10 @@ void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>&
 			if (grammar.Productions[nextState].find(symbol) == grammar.Productions[nextState].end()) {
 				grammar.Productions[nextState][symbol] = vector<string>();
 			}
+			if (nextState == "H")
+			{
+				statesGrammar.push_back(nextState);
+			}
 			grammar.Productions[nextState][symbol].push_back(state);
 		}
 	}
@@ -244,11 +241,9 @@ void ParseRightHandedGrammar(vector<string>& statesGrammar, const vector<string>
 
 		wstring stateLR = match[1];
 		string state = converter.to_bytes(stateLR);
-		//string state = match[1];
 
 		wstring transitionsLR = match[2];
 		string transitions = converter.to_bytes(transitionsLR);
-		//string transitions = match[2];
 
 		if (grammar.Productions.find(state) == grammar.Productions.end()) {
 			grammar.Productions[state] = map<string, vector<string>>();
@@ -283,21 +278,11 @@ void WriteToFile(const vector<string>& statesGrammar, const vector<string>& line
 	}
 	else if (grammar.Type == GrammarType::RightSided)
 	{
-		//initState = grammar.Productions.begin()->first;
 		initState = statesGrammar[0];
 	}
 	else {
 		throw invalid_argument("Grammar does not have any productions.");
 	}
-
-	//vector<string> states;
-	//for (const auto& production : grammar.Productions)
-	//{
-	//	if (production.first != initState)
-	//	{
-	//		states.push_back(production.first);
-	//	}
-	//}
 
 	set<string> symbolSet;
 	for (const auto& production : grammar.Productions)
