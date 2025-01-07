@@ -299,7 +299,7 @@ void WriteToFile(const vector<string>& statesGrammar, const vector<string>& line
 	//заголовки CSV
 	vector<string> header1 = { "" };
 	for (const auto& state : statesGrammar) {
-		if (state == statesGrammar[1])
+		if (state == grammar.FinaleState)
 		{
 			header1.push_back("F");
 		}
