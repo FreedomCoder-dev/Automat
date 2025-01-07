@@ -10,7 +10,7 @@ class Grammar {
 public:
 	GrammarType Type = GrammarType::Undefined;
 	string FinaleState;
-	map<string, map<string, vector<string>>> Productions;
+	unordered_map<string, map<string, vector<string>>> Productions;
 };
 
 string join(const vector<string>& vec, const string& delimiter) {
@@ -148,7 +148,7 @@ void DetermineGrammarType(const vector<string>& lines, Grammar& grammar) {
 	}
 }
 
-void ParseLeftHandedGrammar(const vector<string>& lines, Grammar& grammar) {
+void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>& lines, Grammar& grammar) {
 	regex grammarPattern(R"(^\s*<(\w+)>\s*->\s*((?:<\w+>\s+)?[\wε](?:\s*\|\s*(?:<\w+>\s+)?[\wε])*)\s*$)");
 	regex transitionPattern(R"(^\s*(?:<(\w*)>)?\s*([\wε]*)\s*$)");
 
@@ -225,7 +225,7 @@ void ParseLeftHandedGrammar(const vector<string>& lines, Grammar& grammar) {
 	}
 }
 
-void ParseRightHandedGrammar(const vector<string>& lines, Grammar& grammar) {
+void ParseRightHandedGrammar(vector<string>& statesGrammar, const vector<string>& lines, Grammar& grammar) {
 	regex grammarPattern(R"(^\s*<(\w+)>\s*->\s*([\wε](?:\s+<\w+>)?(?:\s*\|\s*[\wε](?:\s+<\w+>)?)*)\s*$)");
 	regex transitionPattern(R"(^\s*([\wε]*)\s*(?:<(\w*)>)?\s*$)");
 
@@ -252,6 +252,7 @@ void ParseRightHandedGrammar(const vector<string>& lines, Grammar& grammar) {
 
 		if (grammar.Productions.find(state) == grammar.Productions.end()) {
 			grammar.Productions[state] = map<string, vector<string>>();
+			statesGrammar.push_back(state);
 		}
 
 		istringstream transitionsStream(transitions);
@@ -271,9 +272,10 @@ void ParseRightHandedGrammar(const vector<string>& lines, Grammar& grammar) {
 	}
 	grammar.Productions[finalState] = map<string, vector<string>>();
 	grammar.FinaleState = finalState;
+	statesGrammar.push_back(finalState);
 }
 
-void WriteToFile(const vector<string>& lines, const Grammar& grammar, const std::string& outputFileName) {
+void WriteToFile(const vector<string>& statesGrammar, const vector<string>& lines, const Grammar& grammar, const std::string& outputFileName) {
 	string initState;
 	if (grammar.Type == GrammarType::LeftSided)
 	{
@@ -281,29 +283,21 @@ void WriteToFile(const vector<string>& lines, const Grammar& grammar, const std:
 	}
 	else if (grammar.Type == GrammarType::RightSided)
 	{
-		initState = grammar.Productions.begin()->first;
+		//initState = grammar.Productions.begin()->first;
+		initState = statesGrammar[0];
 	}
 	else {
 		throw invalid_argument("Grammar does not have any productions.");
 	}
 
-	vector<string> states;
-	unsigned int a = 0;
-	for (int a = 0; a < lines.size(); a++)//(const auto& production : grammar.Productions)
-	{
-		string small = lines[a];
-		small = small.substr(1, small.find(">"));
-		small = small.substr(0, small.size() - 1);
-		states.push_back(small);
-		if (a == lines.size() - 1)
-		{
-			states.push_back("F");
-		}
-		//if (production.first != initState)
-		//{
-		//	states.push_back(production.first);
-		//}
-	}
+	//vector<string> states;
+	//for (const auto& production : grammar.Productions)
+	//{
+	//	if (production.first != initState)
+	//	{
+	//		states.push_back(production.first);
+	//	}
+	//}
 
 	set<string> symbolSet;
 	for (const auto& production : grammar.Productions)
@@ -319,8 +313,8 @@ void WriteToFile(const vector<string>& lines, const Grammar& grammar, const std:
 
 	//заголовки CSV
 	vector<string> header1 = { "" };
-	for (const auto& state : states) {
-		if (state == states[states.size() - 1])
+	for (const auto& state : statesGrammar) {//states) { Там где стоит statesGrammar, раньше стоял states
+		if (state == statesGrammar[statesGrammar.size() - 1])
 		{
 			header1.push_back("F");
 		}
@@ -331,13 +325,13 @@ void WriteToFile(const vector<string>& lines, const Grammar& grammar, const std:
 	}
 
 	vector<string> header2 = { "" };
-	for (size_t i = 0; i < states.size(); ++i) {
+	for (size_t i = 0; i < statesGrammar.size(); ++i) {
 		header2.push_back("q" + std::to_string(i));
 	}
 
 	map<string, string> stateIndexMap;
-	for (size_t i = 0; i < states.size(); ++i) {
-		stateIndexMap[states[i]] = "q" + std::to_string(i);
+	for (size_t i = 0; i < statesGrammar.size(); ++i) {
+		stateIndexMap[statesGrammar[i]] = "q" + std::to_string(i);
 	}
 
 	//Создаём строки для CSV
@@ -345,7 +339,7 @@ void WriteToFile(const vector<string>& lines, const Grammar& grammar, const std:
 	for (const auto& symbol : symbols) 
 	{
 		vector<string> row = { symbol };
-		for (const auto& state : states)
+		for (const auto& state : statesGrammar)
 		{
 			if (grammar.Productions.count(state) && grammar.Productions.at(state).count(symbol))
 			{
@@ -382,18 +376,19 @@ int main(int argc, char* argv[])
 	vector<string> combinedLines = CombinedLines(lines);
 	Grammar grammar;
 	DetermineGrammarType(combinedLines, grammar);
+	vector<string> statesGrammar;
 
 	if (grammar.Type == GrammarType::LeftSided) {
-		ParseLeftHandedGrammar(combinedLines, grammar);
+		ParseLeftHandedGrammar(statesGrammar,  combinedLines, grammar);
 	}
 	else if (grammar.Type == GrammarType::RightSided) {
-		ParseRightHandedGrammar(combinedLines, grammar);
+		ParseRightHandedGrammar(statesGrammar, combinedLines, grammar);
 	}
 	else {
 		throw std::runtime_error("Тип грамматики не определен");
 	}
 
-	WriteToFile(combinedLines, grammar, outputFile);
+	WriteToFile(statesGrammar, combinedLines, grammar, outputFile);
 
 	return 0;
 }
