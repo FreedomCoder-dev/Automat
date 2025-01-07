@@ -215,7 +215,7 @@ void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>&
 			}
 			if (nextState == "H")
 			{
-				statesGrammar.push_back(nextState);
+				statesGrammar.insert(statesGrammar.begin(), nextState);
 			}
 			grammar.Productions[nextState][symbol].push_back(state);
 		}
@@ -298,7 +298,7 @@ void WriteToFile(const vector<string>& statesGrammar, const vector<string>& line
 
 	//заголовки CSV
 	vector<string> header1 = { "" };
-	for (const auto& state : statesGrammar) {//states) { Там где стоит statesGrammar, раньше стоял states
+	for (const auto& state : statesGrammar) {
 		if (state == statesGrammar[statesGrammar.size() - 1])
 		{
 			header1.push_back("F");
