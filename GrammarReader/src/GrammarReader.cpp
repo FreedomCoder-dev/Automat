@@ -221,6 +221,7 @@ void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>&
 			grammar.Productions[nextState][symbol].push_back(state);
 		}
 	}
+	statesGrammar.push_back("H");
 }
 
 void ParseRightHandedGrammar(vector<string>& statesGrammar, const vector<string>& lines, Grammar& grammar) {
