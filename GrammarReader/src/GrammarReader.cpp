@@ -216,10 +216,10 @@ void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>&
 			if (grammar.Productions[nextState].find(symbol) == grammar.Productions[nextState].end()) {
 				grammar.Productions[nextState][symbol] = vector<string>();
 			}
-			if (nextState == "H")
-			{
-				statesGrammar.insert(statesGrammar.begin(), nextState);
-			}
+			//if (nextState == "H")
+			//{
+			//	statesGrammar.insert(statesGrammar.begin(), nextState);
+			//}
 			grammar.Productions[nextState][symbol].push_back(state);
 		}
 	}
