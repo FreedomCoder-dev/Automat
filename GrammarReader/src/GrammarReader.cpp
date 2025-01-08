@@ -87,7 +87,8 @@ void DetermineGrammarType(const vector<string>& lines, Grammar& grammar) {
 	bool isRightSided = true;
 
 	regex startsWithNonterminal(R"(^<\w+>.*)");
-	regex endsWithNonterminal(R"(.*<\w+>$)");
+	//regex endsWithNonterminal(R"(.*<\w+>$)");
+	regex endsWithNonterminal(R"(.*<\w+>\s*$)");
 
 	for (const string& line : lines) {
 		// Разделяем строку на левую и правую части
