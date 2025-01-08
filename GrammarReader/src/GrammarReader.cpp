@@ -155,6 +155,8 @@ void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>&
 
 	wregex grammarPatternLR(LR"(^\s*<(\w+)>\s*->\s*((?:<\w+>\s+)?[\wε](?:\s*\|\s*(?:<\w+>\s+)?[\wε])*)\s*$)");
 
+	statesGrammar.push_back("H");
+	
 	for (const string& line : lines)
 	{
 		wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
@@ -221,7 +223,6 @@ void ParseLeftHandedGrammar(vector<string>& statesGrammar, const vector<string>&
 			grammar.Productions[nextState][symbol].push_back(state);
 		}
 	}
-	statesGrammar.push_back("H");
 }
 
 void ParseRightHandedGrammar(vector<string>& statesGrammar, const vector<string>& lines, Grammar& grammar) {
