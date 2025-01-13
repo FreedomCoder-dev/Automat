@@ -133,10 +133,23 @@ unordered_set<string> GetDependencies(const string& newState, const map<string, 
 }
 
 string FindNewStateKey(const map<string, vector<string>>& iterateStates, const vector<string>& transitionsToCheck) {
-    unordered_set<string> transitionsSet(transitionsToCheck.begin(), transitionsToCheck.end());
+    unordered_set<string> transitionsSet;
+    for (const auto& transition : transitionsToCheck) {
+        transitionsSet.insert(transition);
+    }
 
-    for (const auto& [key, value] : iterateStates) {
-        unordered_set<string> valueSet(value.begin(), value.end());
+    // Итерируем по iterateStates
+    for (const auto& statePair : iterateStates) {
+        const string& key = statePair.first;
+        const vector<string>& value = statePair.second;
+
+        // Создаем unordered_set из value
+        std::unordered_set<string> valueSet;
+        for (const auto& item : value) {
+            valueSet.insert(item);
+        }
+
+        // Сравниваем два unordered_set
         if (valueSet == transitionsSet) {
             return key;
         }
