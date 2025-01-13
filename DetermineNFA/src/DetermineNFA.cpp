@@ -213,15 +213,24 @@ void WriteToFile(const string& outputFileName, const vector<State>& outputStates
 
     // Заголовки для конечных состояний и имен состояний
     writer << ";";
+    string output;
     for (const auto& state : outputStates) {
-        writer << (state.IsFinit ? "F" : "") << ";";
+        output += (state.IsFinit ? "F" : "");
+        output += ";";
+        //writer << (state.IsFinit ? "F" : "") << ";";
     }
+    output.pop_back();
+    writer << output;
     writer << endl;
 
     writer << ";";
+    output.clear();
     for (const auto& state : outputStates) {
-        writer << state.StateName << ";";
+        output += state.StateName + ";";
+        //writer << state.StateName << ";";
     }
+    output.pop_back();
+    writer << output;
     writer << endl;
 
     // Создаем строки для переходов
