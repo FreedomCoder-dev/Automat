@@ -260,7 +260,7 @@ void WriteToFile(const string& outputFileName, const vector<State>& outputStates
     vector<vector<string>> rows;
     vector<string> symbols;
     for (const auto& symbol : outputStates[0].Transitions) {
-        if (symbol.first != "Оµ")
+        if ((symbol.first != "Оµ") && (symbol.first != "ε"))
         {
             symbols.push_back(symbol.first);
         }
@@ -271,7 +271,7 @@ void WriteToFile(const string& outputFileName, const vector<State>& outputStates
         vector<string> row = { symbol };
 
         for (const auto& state : outputStates) {
-	    if ((state.Transitions.count(symbol)) && (symbol != "Оµ")) {
+	    if ((state.Transitions.count(symbol)) && (symbol != "Оµ") && (symbol != "ε")) {
             //if (state.Transitions.count(symbol)) {
                 string transitions;
                 for (const auto& nextState : state.Transitions.at(symbol)) {
