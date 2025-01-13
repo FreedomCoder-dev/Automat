@@ -1,3 +1,5 @@
+#include "DetermineNFA.h"
+
 struct State {
     bool IsFinit = false;
     string StateName;
