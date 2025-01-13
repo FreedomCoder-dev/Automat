@@ -156,6 +156,16 @@ string FindNewStateKey(const map<string, vector<string>>& iterateStates, const v
     }
 
     return "";
+    //unordered_set<string> transitionsSet(transitionsToCheck.begin(), transitionsToCheck.end());
+
+    //for (const auto& [key, value] : iterateStates) {
+    //    unordered_set<string> valueSet(value.begin(), value.end());
+    //    if (valueSet == transitionsSet) {
+    //        return key;
+    //    }
+    //}
+
+    //return "";
 }
 
 vector<State> NewStates(const vector<State>& inputStates, const vector<Epsilon>& statesWithEpsilon) {
