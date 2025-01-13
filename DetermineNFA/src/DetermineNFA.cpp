@@ -1,5 +1,3 @@
-#include "DetermineNFA.h"
-
 struct State {
     bool IsFinit = false;
     string StateName;
@@ -16,7 +14,6 @@ vector<State> ReadFromCSV(const string& inputFileName) {
     vector<State> states;
     string line;
 
-    // Чтение первой строки (конечные состояния)
     getline(file, line);
     vector<string> finalStates;
     stringstream ss(line);
@@ -29,7 +26,6 @@ vector<State> ReadFromCSV(const string& inputFileName) {
         finalStates.push_back(token);
     }
 
-    // Чтение второй строки (имена состояний)
     getline(file, line);
     vector<string> stateNames;
     stringstream ss2(line);
@@ -301,14 +297,14 @@ void WriteToFile(const string& outputFileName, const vector<State>& outputStates
 }
 
 int main(int argc, char* argv[]) {
-	string inputFile = argv[1];
-	string outputFile = argv[2];
+    string inputFile = argv[1];
+    string outputFile = argv[2];
 
-	vector<State> inputStates = ReadFromCSV(inputFile);//полностью правильная
-	vector<Epsilon> statesWithEpsilon = FindEpsilonStates(inputStates);
-	vector<State> outputStates = NewStates(inputStates, statesWithEpsilon);
+    vector<State> inputStates = ReadFromCSV(inputFile);//полностью правильная
+    vector<Epsilon> statesWithEpsilon = FindEpsilonStates(inputStates);
+    vector<State> outputStates = NewStates(inputStates, statesWithEpsilon);
 
-	WriteToFile(outputFile, outputStates);
-	
-	return 0;
+    WriteToFile(outputFile, outputStates);
+
+    return 0;
 }
