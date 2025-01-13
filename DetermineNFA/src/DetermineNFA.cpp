@@ -24,6 +24,10 @@ vector<State> ReadFromCSV(const string& inputFileName) {
     while (getline(ss, token, ';')) {
         finalStates.push_back(token);
     }
+    if (token == "")
+    {
+        finalStates.push_back(token);
+    }
 
     // Чтение второй строки (имена состояний)
     getline(file, line);
