@@ -23,8 +23,7 @@ vector<State> ReadFromCSV(const string& inputFileName) {
     while (getline(ss, token, ';')) {
         finalStates.push_back(token);
     }
-    if (token == "")
-    {
+    if (token == "") {
         finalStates.push_back(token);
     }
 
@@ -52,8 +51,7 @@ vector<State> ReadFromCSV(const string& inputFileName) {
         while (getline(ss3, token, ';')) {
             parts.push_back(token);
         }
-        if (token == "")
-        {
+        if (token == "") {
             parts.push_back("");
         }
         string transitionName = parts[0];
@@ -67,6 +65,7 @@ vector<State> ReadFromCSV(const string& inputFileName) {
                         transitions.push_back(token);
                     }
                 }
+                sort(transitions.begin(), transitions.end()); // Сортировка переходов
                 states[j - 1].Transitions[transitionName] = transitions;
             }
             else {
@@ -85,7 +84,7 @@ vector<Epsilon> FindEpsilonStates(const vector<State>& inputStates) {
         Epsilon tempEpsilonState;
         tempEpsilonState.StateName = state.StateName;
 
-        unordered_set<string> statesList = { state.StateName };
+        set<string> statesList = { state.StateName };
         queue<string> queue;
         queue.push(state.StateName);
 
@@ -97,7 +96,7 @@ vector<Epsilon> FindEpsilonStates(const vector<State>& inputStates) {
                 return s.StateName == currentStateName;
                 });
 
-            if (currentState->Transitions.count("Оµ")) {// currentState != inputStates.end() &&
+            if (currentState->Transitions.count("Оµ")) {
                 for (const auto& transition : currentState->Transitions.at("Оµ")) {
                     if (statesList.find(transition) == statesList.end()) {
                         statesList.insert(transition);
@@ -114,8 +113,8 @@ vector<Epsilon> FindEpsilonStates(const vector<State>& inputStates) {
     return epsilonStates;
 }
 
-unordered_set<string> GetDependencies(const string& newState, const map<string, vector<string>>& statesToIterate, const vector<Epsilon>& statesWithEpsilon) {
-    unordered_set<string> dependency;
+set<string> GetDependencies(const string& newState, const map<string, vector<string>>& statesToIterate, const vector<Epsilon>& statesWithEpsilon) {
+    set<string> dependency;
 
     for (const auto& state : statesToIterate.at(newState)) {
         for (const auto& epsilonState : statesWithEpsilon) {
@@ -131,39 +130,16 @@ unordered_set<string> GetDependencies(const string& newState, const map<string, 
 }
 
 string FindNewStateKey(const map<string, vector<string>>& iterateStates, const vector<string>& transitionsToCheck) {
-    unordered_set<string> transitionsSet;
-    for (const auto& transition : transitionsToCheck) {
-        transitionsSet.insert(transition);
-    }
+    set<string> transitionsSet(transitionsToCheck.begin(), transitionsToCheck.end());
 
-    // Итерируем по iterateStates
-    for (const auto& statePair : iterateStates) {
-        const string& key = statePair.first;
-        const vector<string>& value = statePair.second;
-
-        // Создаем unordered_set из value
-        std::unordered_set<string> valueSet;
-        for (const auto& item : value) {
-            valueSet.insert(item);
-        }
-
-        // Сравниваем два unordered_set
+    for (const auto& [key, value] : iterateStates) {
+        set<string> valueSet(value.begin(), value.end());
         if (valueSet == transitionsSet) {
             return key;
         }
     }
 
     return "";
-    //unordered_set<string> transitionsSet(transitionsToCheck.begin(), transitionsToCheck.end());
-
-    //for (const auto& [key, value] : iterateStates) {
-    //    unordered_set<string> valueSet(value.begin(), value.end());
-    //    if (valueSet == transitionsSet) {
-    //        return key;
-    //    }
-    //}
-
-    //return "";
 }
 
 vector<State> NewStates(const vector<State>& inputStates, const vector<Epsilon>& statesWithEpsilon) {
@@ -178,7 +154,7 @@ vector<State> NewStates(const vector<State>& inputStates, const vector<Epsilon>&
     // Основной перебор
     for (size_t i = 0; i < statesToIterate.size(); ++i) {
         string newState = states[i];
-        unordered_set<string> dependency = GetDependencies(newState, statesToIterate, statesWithEpsilon);
+        set<string> dependency = GetDependencies(newState, statesToIterate, statesWithEpsilon);
 
         bool isFinit = any_of(dependency.begin(), dependency.end(), [&](const string& t) {
             return any_of(inputStates.begin(), inputStates.end(), [&](const State& s) {
@@ -238,7 +214,6 @@ void WriteToFile(const string& outputFileName, const vector<State>& outputStates
     for (const auto& state : outputStates) {
         output += (state.IsFinit ? "F" : "");
         output += ";";
-        //writer << (state.IsFinit ? "F" : "") << ";";
     }
     output.pop_back();
     writer << output;
@@ -248,7 +223,6 @@ void WriteToFile(const string& outputFileName, const vector<State>& outputStates
     output.clear();
     for (const auto& state : outputStates) {
         output += state.StateName + ";";
-        //writer << state.StateName << ";";
     }
     output.pop_back();
     writer << output;
@@ -258,8 +232,7 @@ void WriteToFile(const string& outputFileName, const vector<State>& outputStates
     vector<vector<string>> rows;
     vector<string> symbols;
     for (const auto& symbol : outputStates[0].Transitions) {
-        if ((symbol.first != "Оµ") && (symbol.first != "ε"))
-        {
+        if ((symbol.first != "Оµ") && (symbol.first != "ε")) {
             symbols.push_back(symbol.first);
         }
     }
@@ -302,7 +275,7 @@ int main(int argc, char* argv[]) {
     string inputFile = argv[1];
     string outputFile = argv[2];
 
-    vector<State> inputStates = ReadFromCSV(inputFile);//полностью правильная
+    vector<State> inputStates = ReadFromCSV(inputFile);
     vector<Epsilon> statesWithEpsilon = FindEpsilonStates(inputStates);
     vector<State> outputStates = NewStates(inputStates, statesWithEpsilon);
 
